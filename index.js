@@ -32,7 +32,7 @@ const start = async () => {
         ])
 
         bot.on( 'message', async msg => {
-            const chatId = msg.chat.id
+            const chatId = String( msg.chat.id )
             const text = msg.text
 
             // bot.sendMessage( chatId, text )
@@ -41,7 +41,17 @@ const start = async () => {
             {
                 if( text === '/start' )
                 {
-                    await User.create( { chatId } )
+                    // await User.create( { chatId } )
+                    // console.log( "hello" )
+                    // console.log( typeof chatId )
+                    // chatId = String( chatId )
+                    const user = await User.findOne({ where: { chatId } });
+                    if (!user) {
+                        await User.create({ chatId, rightAnswer: 0, wrongAnswer: 0 });
+                    } else {
+                        console.log('Пользователь с таким chatId уже существует:', chatId);
+                    }
+
 
                     await bot.sendSticker( chatId, 'https://ih1.redbubble.net/image.2957895003.6553/st,small,507x507-pad,600x600,f8f8f8.u5.jpg' )
                     await bot.sendMessage( chatId, 'Greetings' )
@@ -49,14 +59,9 @@ const start = async () => {
                 }
                 if( text === '/info' )
                 {
-                    // const user = await User.findOne( { chatId } )
+                    const user = await User.findOne( { chatId } )
                     // console.log( user )
-                    const user = await User.findOne({ where: { chatId } });
-                    if (!user) {
-                        await User.create({ chatId, rightAnswer: 0, wrongAnswer: 0 });
-                    } else {
-                        console.log('Пользователь с таким chatId уже существует:', chatId);
-                    }
+
                     await bot.sendMessage( chatId, `You are ${msg.chat.first_name} ${msg.chat.last_name}. Right answers: ${user.rightAnswer}. Wrong: ${user.wrongAnswer}`)
                     return
                 }
