@@ -49,8 +49,14 @@ const start = async () => {
                 }
                 if( text === '/info' )
                 {
-                    const user = await User.findOne( { chatId } )
+                    // const user = await User.findOne( { chatId } )
                     // console.log( user )
+                    const user = await User.findOne({ where: { chatId } });
+                    if (!user) {
+                        await User.create({ chatId, rightAnswer: 0, wrongAnswer: 0 });
+                    } else {
+                        console.log('Пользователь с таким chatId уже существует:', chatId);
+                    }
                     await bot.sendMessage( chatId, `You are ${msg.chat.first_name} ${msg.chat.last_name}. Right answers: ${user.rightAnswer}. Wrong: ${user.wrongAnswer}`)
                     return
                 }
